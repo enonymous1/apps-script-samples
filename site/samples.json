@@ -1,0 +1,82 @@
+[
+  {
+    "slug": "calendar-daily-agenda",
+    "title": "Calendar Daily Agenda",
+    "description": "Emails tomorrow's calendar events to one recipient, defaulting to the script owner's own address. Add a morning time-driven trigger for a daily agenda.",
+    "services": [
+      "Calendar",
+      "Gmail"
+    ],
+    "difficulty": "Beginner",
+    "scopes": [
+      "https://www.googleapis.com/auth/calendar.readonly",
+      "https://www.googleapis.com/auth/gmail.send"
+    ],
+    "setup": [
+      "Create a script project and copy in Code.gs and appsscript.json.",
+      "Optionally set Script Properties: AGENDA_RECIPIENT, AGENDA_CALENDAR.",
+      "Run sendDailyAgenda() once and check the inbox and execution log.",
+      "Add a morning time-driven trigger for a daily agenda."
+    ],
+    "code": "/**\n * Calendar Daily Agenda.\n *\n * Emails tomorrow's calendar events to one recipient.\n * Defaults to the script owner's own email address, so nothing\n * personal is hardcoded.\n *\n * Script Properties (Project Settings > Script Properties):\n *   AGENDA_RECIPIENT - email address (default: active user's email)\n *   AGENDA_CALENDAR  - calendar ID (default: primary calendar)\n */\n\nfunction sendDailyAgenda() {\n  var props = PropertiesService.getScriptProperties();\n  var recipient = props.getProperty('AGENDA_RECIPIENT') ||\n    Session.getActiveUser().getEmail();\n  var calendarId = props.getProperty('AGENDA_CALENDAR') || 'primary';\n\n  var tomorrow = new Date();\n  tomorrow.setDate(tomorrow.getDate() + 1);\n  var start = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());\n  var end = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate() + 1);\n\n  var calendar = CalendarApp.getCalendarById(calendarId);\n  var events = calendar.getEvents(start, end);\n  var lines = events.map(function (event) {\n    return formatEvent(event);\n  });\n\n  var dateLabel = Utilities.formatDate(start, Session.getScriptTimeZone(), 'EEEE, MMMM d');\n  var subject = 'Agenda for ' + dateLabel;\n  var body = lines.length === 0 ?\n    'No events tomorrow (' + dateLabel + ').' :\n    'Agenda for ' + dateLabel + ':\\n\\n' + lines.join('\\n');\n  GmailApp.sendEmail(recipient, subject, body);\n  Logger.log(body);\n}\n\nfunction formatEvent(event) {\n  var start = Utilities.formatDate(event.getStartTime(), Session.getScriptTimeZone(), 'h:mm a');\n  var title = event.getTitle();\n  if (event.isAllDayEvent()) {\n    return 'All day: ' + title;\n  }\n  return start + ' - ' + title;\n}\n"
+  },
+  {
+    "slug": "drive-file-organizer",
+    "title": "Drive File Organizer",
+    "description": "Moves files from one Drive folder into subfolders by type (Documents, Spreadsheets, Presentations, Images, PDFs, Other). Dry-run is on by default.",
+    "services": [
+      "Drive"
+    ],
+    "difficulty": "Intermediate",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive"
+    ],
+    "setup": [
+      "Create a script project and copy in Code.gs and appsscript.json.",
+      "Set Script Properties: SOURCE_FOLDER_ID, DRY_RUN.",
+      "Run organizeDriveFolder() once and check the execution log (dry run).",
+      "Set DRY_RUN to false only when the log looks right, then run it again."
+    ],
+    "code": "/**\n * Drive File Organizer.\n *\n * Moves files from one folder into subfolders by type:\n * Documents, Spreadsheets, Presentations, Images, PDFs, Other.\n *\n * Script Properties (Project Settings > Script Properties):\n *   SOURCE_FOLDER_ID - Drive folder ID to organize (required)\n *   DRY_RUN          - \"true\" (default) logs only; \"false\" moves files\n *\n * Subfolders are created inside the source folder on first use.\n * Files already in a subfolder are left alone: only the top level\n * of the source folder is scanned.\n */\n\nfunction organizeDriveFolder() {\n  var props = PropertiesService.getScriptProperties();\n  var folderId = props.getProperty('SOURCE_FOLDER_ID');\n  if (!folderId) {\n    throw new Error('Set the SOURCE_FOLDER_ID Script Property first.');\n  }\n  var dryRun = props.getProperty('DRY_RUN') !== 'false';\n\n  var folder = DriveApp.getFolderById(folderId);\n  var files = folder.getFiles();\n  var moved = 0;\n  while (files.hasNext()) {\n    var file = files.next();\n    var category = categoryForMimeType(file.getMimeType());\n    if (dryRun) {\n      Logger.log('[DRY RUN] Would move \"' + file.getName() + '\" to ' + category);\n    } else {\n      var target = getOrCreateSubfolder(folder, category);\n      file.moveTo(target);\n    }\n    moved++;\n  }\n  Logger.log('Done. Files considered: ' + moved + '. Dry run: ' + dryRun);\n}\n\nfunction categoryForMimeType(mimeType) {\n  if (mimeType === MimeType.GOOGLE_DOCS) return 'Documents';\n  if (mimeType === MimeType.GOOGLE_SHEETS) return 'Spreadsheets';\n  if (mimeType === MimeType.GOOGLE_SLIDES) return 'Presentations';\n  if (mimeType === MimeType.PDF) return 'PDFs';\n  if (mimeType.indexOf('image/') === 0) return 'Images';\n  return 'Other';\n}\n\nfunction getOrCreateSubfolder(folder, name) {\n  var existing = folder.getFoldersByName(name);\n  if (existing.hasNext()) {\n    return existing.next();\n  }\n  return folder.createFolder(name);\n}\n"
+  },
+  {
+    "slug": "gmail-inbox-triage",
+    "title": "Gmail Inbox Triage",
+    "description": "Labels threads matching a Gmail search query and optionally archives them. Dry-run is on by default, so it logs what it would do before changing anything.",
+    "services": [
+      "Gmail"
+    ],
+    "difficulty": "Beginner",
+    "scopes": [
+      "https://www.googleapis.com/auth/gmail.modify"
+    ],
+    "setup": [
+      "Create a script project and copy in Code.gs and appsscript.json.",
+      "Set Script Properties: TRIAGE_QUERY, TRIAGE_LABEL, ARCHIVE_AFTER, DRY_RUN.",
+      "Run triageInbox() once and check the execution log (dry run).",
+      "Set DRY_RUN to false only when the log looks right, then run it again."
+    ],
+    "code": "/**\n * Gmail Inbox Triage.\n *\n * Labels threads matching a search query, and optionally archives them.\n * Dry-run is ON by default: set the DRY_RUN Script Property to \"false\"\n * only when you are ready for it to change labels.\n *\n * Script Properties (Project Settings > Script Properties):\n *   TRIAGE_QUERY  - Gmail search query, e.g. \"is:unread older_than:7d\"\n *                   (default: \"is:unread older_than:7d\")\n *   TRIAGE_LABEL  - label to apply, e.g. \"To Review\" (default: \"To Review\")\n *   ARCHIVE_AFTER - \"true\" to archive labelled threads (default: \"false\")\n *   DRY_RUN       - \"true\" (default) logs only; \"false\" applies changes\n */\n\nfunction triageInbox() {\n  var props = PropertiesService.getScriptProperties();\n  var query = props.getProperty('TRIAGE_QUERY') || 'is:unread older_than:7d';\n  var labelName = props.getProperty('TRIAGE_LABEL') || 'To Review';\n  var archiveAfter = props.getProperty('ARCHIVE_AFTER') === 'true';\n  var dryRun = props.getProperty('DRY_RUN') !== 'false';\n\n  var label = dryRun ? null : GmailApp.getUserLabelByName(labelName) ||\n    GmailApp.createLabel(labelName);\n\n  var threads = GmailApp.search(query, 0, 100);\n  Logger.log('Found ' + threads.length + ' thread(s) for query: ' + query);\n\n  threads.forEach(function (thread) {\n    var subject = thread.getFirstMessageSubject();\n    if (dryRun) {\n      Logger.log('[DRY RUN] Would label \"' + subject + '\" with \"' + labelName + '\"' +\n        (archiveAfter ? ' and archive it.' : '.'));\n      return;\n    }\n    thread.addLabel(label);\n    if (archiveAfter) {\n      thread.moveToArchive();\n    }\n  });\n\n  Logger.log('Done. Dry run: ' + dryRun);\n}\n"
+  },
+  {
+    "slug": "sheet-weekly-report",
+    "title": "Sheet Weekly Report",
+    "description": "Reads a spreadsheet, counts its data rows, optionally sums a numeric column, and emails the summary. All IDs and the recipient live in Script Properties.",
+    "services": [
+      "Sheets",
+      "Gmail"
+    ],
+    "difficulty": "Intermediate",
+    "scopes": [
+      "https://www.googleapis.com/auth/spreadsheets.readonly",
+      "https://www.googleapis.com/auth/gmail.send"
+    ],
+    "setup": [
+      "Create a script project and copy in Code.gs and appsscript.json.",
+      "Set Script Properties: REPORT_SPREADSHEET_ID, REPORT_RECIPIENT, REPORT_SHEET_NAME, REPORT_AMOUNT_COLUMN.",
+      "Run sendWeeklyReport() once and check the inbox and execution log.",
+      "Add a weekly time-driven trigger when the report looks right."
+    ],
+    "code": "/**\n * Sheet Weekly Report.\n *\n * Reads rows from a spreadsheet and emails a short summary:\n * row count, and the sum of a numeric column when one is configured.\n *\n * Script Properties (Project Settings > Script Properties):\n *   REPORT_SPREADSHEET_ID - spreadsheet ID (required, never hardcoded)\n *   REPORT_SHEET_NAME     - sheet/tab name (default: first sheet)\n *   REPORT_AMOUNT_COLUMN  - 1-based column to sum, e.g. \"3\" (optional)\n *   REPORT_RECIPIENT      - email address for the report (required)\n *\n * The first row is treated as a header and is not counted or summed.\n */\n\nfunction sendWeeklyReport() {\n  var props = PropertiesService.getScriptProperties();\n  var spreadsheetId = props.getProperty('REPORT_SPREADSHEET_ID');\n  var recipient = props.getProperty('REPORT_RECIPIENT');\n  if (!spreadsheetId) {\n    throw new Error('Set the REPORT_SPREADSHEET_ID Script Property first.');\n  }\n  if (!recipient) {\n    throw new Error('Set the REPORT_RECIPIENT Script Property first.');\n  }\n\n  var spreadsheet = SpreadsheetApp.openById(spreadsheetId);\n  var sheetName = props.getProperty('REPORT_SHEET_NAME');\n  var sheet = sheetName ? spreadsheet.getSheetByName(sheetName) :\n    spreadsheet.getSheets()[0];\n  if (!sheet) {\n    throw new Error('Sheet not found: ' + sheetName);\n  }\n\n  var values = sheet.getDataRange().getValues();\n  var summary = summarizeRows(values, props.getProperty('REPORT_AMOUNT_COLUMN'));\n\n  var subject = 'Weekly report: ' + spreadsheet.getName();\n  var body = 'Rows (excluding header): ' + summary.rowCount + '\\n' +\n    (summary.total !== null ? 'Total: ' + summary.total + '\\n' : '') +\n    'Sheet: ' + sheet.getName() + '\\n';\n  GmailApp.sendEmail(recipient, subject, body);\n  Logger.log(body);\n}\n\n/**\n * Pure summary helper, kept separate so its logic is easy to reason\n * about: header row excluded, non-numeric cells ignored in the total.\n */\nfunction summarizeRows(values, amountColumn) {\n  if (!values || values.length < 2) {\n    return { rowCount: 0, total: null };\n  }\n  var rows = values.slice(1);\n  var total = null;\n  if (amountColumn) {\n    var columnIndex = parseInt(amountColumn, 10) - 1;\n    total = 0;\n    rows.forEach(function (row) {\n      var value = Number(row[columnIndex]);\n      if (!isNaN(value)) {\n        total += value;\n      }\n    });\n  }\n  return { rowCount: rows.length, total: total };\n}\n"
+  }
+]

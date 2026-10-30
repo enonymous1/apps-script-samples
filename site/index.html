@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apps Script Samples</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>Apps Script Samples</h1>
+  <p>Small, working Google Apps Script samples. No hardcoded IDs or email
+  addresses — every sample is configured through Script Properties, and
+  the destructive ones dry-run first.</p>
+  <p class="note">This site is generated from the samples themselves:
+  run <code>npm run build:site</code> after editing a sample, and the
+  catalogue, code view, and scopes below stay in sync.</p>
+</header>
+
+<main>
+  <section class="controls" aria-label="Filter samples">
+    <label>Search
+      <input id="search" type="search" placeholder="Search titles, services, descriptions…">
+    </label>
+    <label>Service
+      <select id="service">
+        <option value="">All services</option>
+      </select>
+    </label>
+    <label>Difficulty
+      <select id="difficulty">
+        <option value="">All levels</option>
+        <option>Beginner</option>
+        <option>Intermediate</option>
+      </select>
+    </label>
+  </section>
+
+  <p id="count" aria-live="polite"></p>
+  <section id="cards" class="cards"></section>
+  <section id="detail" class="detail" hidden></section>
+</main>
+
+<footer>
+  <p>Use a sample: copy its <code>Code.gs</code> and
+  <code>appsscript.json</code> into a script project, set its Script
+  Properties, run it once, and check the log before enabling any
+  trigger. Live Google runs are the owner's step — nothing here runs
+  against your account from this page.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

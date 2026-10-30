@@ -1,0 +1,1 @@
+{"dependencies":{},"exceptionLogging":"STACKDRIVER","oauthScopes":["https://www.googleapis.com/auth/gmail.modify"],"runtimeVersion":"V8","timeZone":"America/New_York"}

@@ -1,0 +1,16 @@
+:root { color-scheme: light dark; }
+body { font-family: system-ui, sans-serif; line-height: 1.5; margin: 0 auto; max-width: 72rem; padding: 1rem; }
+header, footer { max-width: 60rem; }
+.note { font-size: 0.95rem; opacity: 0.85; }
+.controls { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0 0.5rem; }
+.controls label { display: flex; flex-direction: column; gap: 0.25rem; font-weight: 600; }
+.controls input, .controls select { font: inherit; font-weight: 400; padding: 0.4rem 0.6rem; }
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+.card { border: 1px solid currentColor; border-radius: 0.5rem; padding: 1rem; text-align: left; font: inherit; background: none; color: inherit; cursor: pointer; }
+.card:hover, .card:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.card h2 { margin: 0 0 0.5rem; font-size: 1.15rem; }
+.card p { margin: 0.25rem 0; }
+.tag { display: inline-block; border: 1px solid currentColor; border-radius: 1rem; font-size: 0.85rem; padding: 0.1rem 0.6rem; margin-right: 0.3rem; }
+.detail { border-top: 2px solid currentColor; margin-top: 2rem; padding-top: 1rem; }
+.detail pre { overflow-x: auto; padding: 1rem; border: 1px solid currentColor; border-radius: 0.5rem; font-size: 0.9rem; }
+.detail code { overflow-wrap: anywhere; }
