@@ -13,6 +13,11 @@
  * of the source folder is scanned.
  */
 
+/**
+ * Organizes the top level of the configured folder by file type.
+ *
+ * @throws {Error} If SOURCE_FOLDER_ID is not set.
+ */
 function organizeDriveFolder() {
   var props = PropertiesService.getScriptProperties();
   var folderId = props.getProperty('SOURCE_FOLDER_ID');
@@ -23,6 +28,10 @@ function organizeDriveFolder() {
 
   var folder = DriveApp.getFolderById(folderId);
   var files = folder.getFiles();
+  // Cache subfolder lookups for the run: the old code called
+  // getFoldersByName() for every file, which is one Drive query per
+  // file even when every file lands in the same category.
+  var subfolders = {};
   var moved = 0;
   while (files.hasNext()) {
     var file = files.next();
@@ -30,7 +39,7 @@ function organizeDriveFolder() {
     if (dryRun) {
       Logger.log('[DRY RUN] Would move "' + file.getName() + '" to ' + category);
     } else {
-      var target = getOrCreateSubfolder(folder, category);
+      var target = getOrCreateSubfolder(folder, category, subfolders);
       file.moveTo(target);
     }
     moved++;
@@ -38,19 +47,39 @@ function organizeDriveFolder() {
   Logger.log('Done. Files considered: ' + moved + '. Dry run: ' + dryRun);
 }
 
+/**
+ * Maps a MIME type to a subfolder category.
+ *
+ * @param {string} mimeType The file's MIME type, e.g. "application/pdf".
+ * @return {string} One of Documents, Spreadsheets, Presentations,
+ *   Images, PDFs, or Other for anything unrecognized.
+ */
 function categoryForMimeType(mimeType) {
   if (mimeType === MimeType.GOOGLE_DOCS) return 'Documents';
   if (mimeType === MimeType.GOOGLE_SHEETS) return 'Spreadsheets';
   if (mimeType === MimeType.GOOGLE_SLIDES) return 'Presentations';
   if (mimeType === MimeType.PDF) return 'PDFs';
-  if (mimeType.indexOf('image/') === 0) return 'Images';
+  if (typeof mimeType === 'string' && mimeType.indexOf('image/') === 0) return 'Images';
   return 'Other';
 }
 
-function getOrCreateSubfolder(folder, name) {
-  var existing = folder.getFoldersByName(name);
-  if (existing.hasNext()) {
-    return existing.next();
+/**
+ * Returns the named subfolder, creating it on first use.
+ *
+ * @param {Object} folder The parent Drive folder.
+ * @param {string} name The subfolder name.
+ * @param {Object} [cache] Optional per-run cache (category -> folder)
+ *   so repeated lookups for the same category do not re-query Drive.
+ * @return {Object} The subfolder.
+ */
+function getOrCreateSubfolder(folder, name, cache) {
+  if (cache && cache[name]) {
+    return cache[name];
   }
-  return folder.createFolder(name);
+  var existing = folder.getFoldersByName(name);
+  var subfolder = existing.hasNext() ? existing.next() : folder.createFolder(name);
+  if (cache) {
+    cache[name] = subfolder;
+  }
+  return subfolder;
 }

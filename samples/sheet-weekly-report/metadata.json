@@ -1,1 +1,20 @@
-{"description":"Reads a spreadsheet, counts its data rows, optionally sums a numeric column, and emails the summary. All IDs and the recipient live in Script Properties.","difficulty":"Intermediate","scopes":["https://www.googleapis.com/auth/spreadsheets.readonly","https://www.googleapis.com/auth/gmail.send"],"services":["Sheets","Gmail"],"setup":["Create a script project and copy in Code.gs and appsscript.json.","Set Script Properties: REPORT_SPREADSHEET_ID, REPORT_RECIPIENT, REPORT_SHEET_NAME, REPORT_AMOUNT_COLUMN.","Run sendWeeklyReport() once and check the inbox and execution log.","Add a weekly time-driven trigger when the report looks right."],"slug":"sheet-weekly-report","title":"Sheet Weekly Report"}
+{
+  "description": "Reads a spreadsheet, counts its data rows, optionally sums a numeric column, and emails the summary. All IDs and the recipient live in Script Properties.",
+  "difficulty": "Intermediate",
+  "scopes": [
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/gmail.send"
+  ],
+  "services": [
+    "Sheets",
+    "Gmail"
+  ],
+  "setup": [
+    "Create a script project and copy in Code.gs and appsscript.json.",
+    "Set Script Properties: REPORT_SPREADSHEET_ID, REPORT_RECIPIENT, REPORT_SHEET_NAME, REPORT_AMOUNT_COLUMN.",
+    "Run sendWeeklyReport() once and check the inbox and execution log.",
+    "Add a weekly time-driven trigger when the report looks right."
+  ],
+  "slug": "sheet-weekly-report",
+  "title": "Sheet Weekly Report"
+}

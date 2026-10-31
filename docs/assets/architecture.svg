@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300" role="img" aria-labelledby="title desc">
+  <title id="title">Apps Script Samples architecture</title>
+  <desc id="desc">Each sample folder holds Code.gs, appsscript.json, and metadata.json. The build script validates them and generates site samples.json. The static site reads that file and renders the catalogue. Tests guard every step, and a workflow deploys the site to GitHub Pages.</desc>
+  <style>
+    .box { fill: #ffffff; stroke: #333333; stroke-width: 1.5; rx: 10; }
+    .accent { fill: #e8f0fe; stroke: #1a56db; stroke-width: 1.5; rx: 10; }
+    .text { font-family: system-ui, sans-serif; font-size: 13px; fill: #111111; }
+    .small { font-size: 11px; fill: #444444; }
+    .arrow { stroke: #333333; stroke-width: 1.5; marker-end: url(#head); }
+  </style>
+  <defs><marker id="head" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#333333" stroke-width="1.5"/></marker></defs>
+  <rect class="box" x="10" y="40" width="170" height="90"/>
+  <text class="text" x="24" y="70">samples/*/</text>
+  <text class="small" x="24" y="90">Code.gs</text>
+  <text class="small" x="24" y="108">appsscript.json</text>
+  <text class="small" x="24" y="126">metadata.json</text>
+  <rect class="accent" x="230" y="40" width="170" height="90"/>
+  <text class="text" x="244" y="70">build-site-data.js</text>
+  <text class="small" x="244" y="90">validates metadata</text>
+  <text class="small" x="244" y="108">+ manifest scopes</text>
+  <text class="small" x="244" y="126">deterministic output</text>
+  <rect class="box" x="450" y="40" width="170" height="90"/>
+  <text class="text" x="464" y="70">site/samples.json</text>
+  <text class="small" x="464" y="90">generated, committed</text>
+  <text class="small" x="464" y="108">code embedded per sample</text>
+  <rect class="box" x="450" y="180" width="170" height="90"/>
+  <text class="text" x="464" y="210">site/ (static)</text>
+  <text class="small" x="464" y="230">index.html + app.js</text>
+  <text class="small" x="464" y="248">search / filter / detail</text>
+  <rect class="accent" x="230" y="180" width="170" height="90"/>
+  <text class="text" x="244" y="210">GitHub Pages</text>
+  <text class="small" x="244" y="230">pages.yml deploys site/</text>
+  <text class="small" x="244" y="248">on push to main</text>
+  <rect class="box" x="10" y="180" width="170" height="90"/>
+  <text class="text" x="24" y="210">tests/samples.test.js</text>
+  <text class="small" x="24" y="230">syntax, scopes, helpers</text>
+  <text class="small" x="24" y="248">stubbed main functions</text>
+  <line class="arrow" x1="180" y1="85" x2="230" y2="85"/>
+  <line class="arrow" x1="400" y1="85" x2="450" y2="85"/>
+  <line class="arrow" x1="535" y1="130" x2="535" y2="180"/>
+  <line class="arrow" x1="450" y1="225" x2="400" y2="225"/>
+  <line class="arrow" x1="180" y1="225" x2="230" y2="225" stroke-dasharray="4 3"/>
+  <text class="small" x="185" y="215">guards</text>
+</svg>

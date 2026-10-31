@@ -1,1 +1,18 @@
-{"description":"Moves files from one Drive folder into subfolders by type (Documents, Spreadsheets, Presentations, Images, PDFs, Other). Dry-run is on by default.","difficulty":"Intermediate","scopes":["https://www.googleapis.com/auth/drive"],"services":["Drive"],"setup":["Create a script project and copy in Code.gs and appsscript.json.","Set Script Properties: SOURCE_FOLDER_ID, DRY_RUN.","Run organizeDriveFolder() once and check the execution log (dry run).","Set DRY_RUN to false only when the log looks right, then run it again."],"slug":"drive-file-organizer","title":"Drive File Organizer"}
+{
+  "description": "Moves files from one Drive folder into subfolders by type (Documents, Spreadsheets, Presentations, Images, PDFs, Other). Dry-run is on by default.",
+  "difficulty": "Intermediate",
+  "scopes": [
+    "https://www.googleapis.com/auth/drive"
+  ],
+  "services": [
+    "Drive"
+  ],
+  "setup": [
+    "Create a script project and copy in Code.gs and appsscript.json.",
+    "Set Script Properties: SOURCE_FOLDER_ID, DRY_RUN.",
+    "Run organizeDriveFolder() once and check the execution log (dry run).",
+    "Set DRY_RUN to false only when the log looks right, then run it again."
+  ],
+  "slug": "drive-file-organizer",
+  "title": "Drive File Organizer"
+}

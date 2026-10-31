@@ -11,8 +11,12 @@
   const detailEl = document.getElementById('detail');
   let samples = [];
 
+  // Escape quotes as well as angle brackets, even though current
+  // call sites only inject into element content: if a future call
+  // site injects into an attribute, unescaped quotes would break out.
   function escapeHtml(text) {
-    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function filtered() {
@@ -46,6 +50,9 @@
 
   function renderDetail(sample) {
     detailEl.hidden = false;
+    // Make the detail focusable so keyboard and screen-reader users
+    // land on the content they just opened, not back at the top.
+    detailEl.setAttribute('tabindex', '-1');
     detailEl.innerHTML = '<h2>' + escapeHtml(sample.title) + '</h2>' +
       '<p>' + escapeHtml(sample.description) + '</p>' +
       '<h3>Setup</h3><ol>' + sample.setup.map((step) => '<li>' + escapeHtml(step) + '</li>').join('') + '</ol>' +
@@ -54,9 +61,15 @@
       '<p>Files: <code>samples/' + escapeHtml(sample.slug) + '/Code.gs</code> and ' +
       '<code>samples/' + escapeHtml(sample.slug) + '/appsscript.json</code></p>';
     detailEl.scrollIntoView();
+    detailEl.focus({ preventScroll: true });
   }
 
-  fetch('samples.json').then((res) => res.json()).then((data) => {
+  // Check res.ok before parsing: without it, a 404 HTML page would
+  // fail inside .json() and surface as a misleading "rebuild" hint.
+  fetch('samples.json').then((res) => {
+    if (!res.ok) throw new Error('samples.json returned ' + res.status);
+    return res.json();
+  }).then((data) => {
     samples = data;
     const services = [...new Set(samples.flatMap((s) => s.services))].sort();
     services.forEach((service) => {

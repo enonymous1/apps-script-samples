@@ -1,1 +1,15 @@
-{"description":"Small, working Google Apps Script samples with a static catalogue site","engines":{"node":">=20"},"license":"MIT","name":"apps-script-samples","private":true,"scripts":{"build:site":"node scripts/build-site-data.js","preview":"node scripts/serve.js","test":"node --test tests/samples.test.js"},"version":"1.0.0"}
+{
+  "description": "Small, working Google Apps Script samples with a static catalogue site",
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "name": "apps-script-samples",
+  "private": true,
+  "scripts": {
+    "build:site": "node scripts/build-site-data.js",
+    "preview": "node scripts/serve.js",
+    "test": "node --test tests/samples.test.js"
+  },
+  "version": "1.1.0"
+}
